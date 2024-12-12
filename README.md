@@ -30,3 +30,9 @@
     - Appium UIAutomator2 Server: `appium driver install uiautomator2`
 - Setup Kronik
     - `poetry install`
+
+## Running the demo
+
+1. Run `appium` in a separate terminal
+2. Start an emulator with `emulator -avd KronikPixel`
+3. Run `poetry run python tests/demo.py`
