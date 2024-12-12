@@ -8,17 +8,17 @@ from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.webdriver.common.actions.pointer_input import PointerInput
 
 # Define Appium server URL
-appium_server_url = 'http://localhost:4723'
+appium_server_url = "http://localhost:4723"
 
 # Set up desired capabilities using UiAutomator2Options
 options = UiAutomator2Options()
-options.platformName = 'Android'
-options.automationName = 'uiautomator2'
-options.deviceName = 'KronikPixel'
-options.appPackage = 'com.android.settings'
-options.appActivity = '.Settings'
-options.language = 'en'
-options.locale = 'US'
+options.platformName = "Android"
+options.automationName = "uiautomator2"
+options.deviceName = "KronikPixel"
+options.appPackage = "com.android.settings"
+options.appActivity = ".Settings"
+options.language = "en"
+options.locale = "US"
 
 
 class TestAppium(unittest.TestCase):
@@ -32,8 +32,8 @@ class TestAppium(unittest.TestCase):
     def test_vertical_scroll(self) -> None:
         # Get the window size
         window_size = self.driver.get_window_size()
-        width = window_size['width']
-        height = window_size['height']
+        width = window_size["width"]
+        height = window_size["height"]
 
         # Define start and end points for vertical scroll
         start_y = int(height * 0.8)
@@ -64,5 +64,5 @@ class TestAppium(unittest.TestCase):
             sleep(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
