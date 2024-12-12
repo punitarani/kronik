@@ -10,7 +10,11 @@ format:
 
 # Lint code using ruff
 lint:
-	poetry run ruff $(TARGETS)
+	poetry run ruff check $(TARGETS)
+
+# Lint and fix code using ruff
+lint-fix:
+	poetry run ruff check --fix $(TARGETS)
 
 # Setup project for development
 setup:
