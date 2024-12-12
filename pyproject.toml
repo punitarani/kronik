@@ -8,6 +8,11 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12 <3.14"
 appium-python-client = "^4.4.0"
+einops = "^0.8.0"
+pillow = "^11.0.0"
+transformers = "^4.47.0"
+torch = "^2.5.1"
+torchvision = "^0.20.1"
 
 
 [tool.poetry.group.dev.dependencies]
