@@ -12,7 +12,7 @@
     - Download
       from [https://developer.android.com/studio/command-line](https://developer.android.com/studio/command-line)
     - Extract the contents to `~/Library/Android/sdk/cmdline-tools/latest`
-    - Add the following to PATH:
+    - Add the following to PATH (might have to add to `.zshrc`/`.bash_profile`):
       ```bash
       export ANDROID_HOME=~/Library/Android/sdk
       export PATH=$ANDROID_HOME/emulator:$PATH
@@ -25,3 +25,8 @@
       `avdmanager create avd -n KronikPixel -k "system-images;android-34;google_apis_playstore;arm64-v8a" --device "pixel"`
     - Start the emulator: `emulator -avd KronikPixel`
     - List all emulators: `emulator -list-avds`
+- Download Appium
+    - Appium: `npm i --location=global appium`
+    - Appium UIAutomator2 Server: `appium driver install uiautomator2`
+- Setup Kronik
+    - `poetry install`
