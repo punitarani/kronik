@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "kronik"
+version = "0.1.0"
+description = "Chronically scrolling visual agent"
+authors = ["Punit Arani <punit@punitsai36@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

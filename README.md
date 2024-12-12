@@ -1,0 +1,27 @@
+# kronik
+
+## Installation
+
+- Prerequisites:
+    - brew
+    - Python 3.12+
+    - Java Runtime Environment (JRE)
+- Android Debug Bridge (adb)
+    - `brew install android-platform-tools`
+- Download Android Command Line tools
+    - Download
+      from [https://developer.android.com/studio/command-line](https://developer.android.com/studio/command-line)
+    - Extract the contents to `~/Library/Android/sdk/cmdline-tools/latest`
+    - Add the following to PATH:
+      ```bash
+      export ANDROID_HOME=~/Library/Android/sdk
+      export PATH=$ANDROID_HOME/emulator:$PATH
+      export PATH=$ANDROID_HOME/platform-tools:$PATH
+      export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+      ```
+    - Download the tools:
+      `sdkmanager --install "platform-tools" "emulator" "platforms;android-34" "system-images;android-34;google_apis_playstore;arm64-v8a"`
+    - Install an emulator:
+      `avdmanager create avd -n KronikPixel -k "system-images;android-34;google_apis_playstore;arm64-v8a" --device "pixel"`
+    - Start the emulator: `emulator -avd KronikPixel`
+    - List all emulators: `emulator -list-avds`
