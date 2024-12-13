@@ -33,6 +33,16 @@
 
 ## Running the demo
 
+This is to test the functionality of the installed packages and tools.
+
 1. Run `appium` in a separate terminal
 2. Start an emulator with `emulator -avd KronikPixel`
 3. Run `poetry run python tests/demo.py`
+
+## Running the application
+
+This runs the main kronik application.
+
+```bash
+poetry run python kronik/main.py
+```
