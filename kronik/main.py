@@ -12,8 +12,7 @@ from time import sleep
 import requests
 from appium.webdriver import Remote
 
-from kronik.device.actions import scroll_down, scroll_up
-from kronik.device.commands import home, screenshot
+from kronik.control import control
 from kronik.device.config import appium_driver, appium_server_url
 from kronik.logger import app_logger as logger
 
@@ -73,26 +72,9 @@ def start_appium_server():
 async def main(driver: Remote):
     logger.info("Starting kronik")
     try:
-        # 1. Go to the home page and take a screenshot
-        home(driver)
-        screenshot(driver)
-
-        # 2. Scroll up and take a screenshot
-        scroll_up(driver)
-        screenshot(driver)
-
-        # 3. Wait 5 seconds
-        logger.info("Waiting for 5 seconds")
-        sleep(5)
-
-        # 4. Scroll down and take a screenshot
-        scroll_down(driver)
-        screenshot(driver)
-
-        logger.info("Completed all actions successfully")
-
-    except Exception as e:
-        logger.error(f"Error in kronik: {str(e)}", exc_info=True)
+        await control(driver=DRIVER)
+    except Exception as exc:
+        logger.error(f"Error in kronik: {str(exc)}", exc_info=True)
         raise
 
 
