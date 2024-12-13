@@ -12,7 +12,7 @@ from appium.webdriver import Remote
 from kronik.actions import scroll_down, scroll_up
 from kronik.commands import home, screenshot
 from kronik.config import appium_driver
-from kronik.logger import main_logger as logger
+from kronik.logger import app_logger as logger
 
 DRIVER = appium_driver()
 

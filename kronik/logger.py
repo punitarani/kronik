@@ -38,5 +38,5 @@ app_logger = setup_logger("kronik")
 
 # Create sub-loggers for different modules
 actions_logger = setup_logger("kronik.actions")
+brain_logger = setup_logger("kronik.brain")
 commands_logger = setup_logger("kronik.commands")
-main_logger = setup_logger("kronik.main")
