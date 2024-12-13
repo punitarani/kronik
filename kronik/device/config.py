@@ -1,4 +1,3 @@
-
 from appium.options.android import UiAutomator2Options
 from appium.options.common import AppiumOptions
 from appium.webdriver import Remote

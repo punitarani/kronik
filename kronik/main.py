@@ -15,6 +15,7 @@ from appium.webdriver import Remote
 from kronik.control import control
 from kronik.device.config import appium_driver, appium_server_url
 from kronik.logger import app_logger as logger
+from kronik.session import Session, save_session_metadata
 
 EMULATOR_NAME = "KronikPixel"
 
@@ -69,10 +70,10 @@ def start_appium_server():
     raise TimeoutError("Appium server did not start within the timeout period.")
 
 
-async def main(driver: Remote):
+async def main(driver: Remote, session: Session):
     logger.info("Starting kronik")
     try:
-        await control(driver=DRIVER)
+        await control(driver=driver, session=session)
     except Exception as exc:
         logger.error(f"Error in kronik: {str(exc)}", exc_info=True)
         raise
@@ -82,7 +83,13 @@ if __name__ == "__main__":
     _emulator_process = None
     _appium_process = None
     DRIVER = None
+    session = None
     try:
+        # Initialize session
+        session = Session()
+        save_session_metadata(session)
+        logger.info(f"Starting new session: {session.id}")
+
         # Start the emulator and Appium server
         _emulator_process = start_emulator()
         _appium_process = start_appium_server()
@@ -91,7 +98,7 @@ if __name__ == "__main__":
         DRIVER = appium_driver()
 
         # Run the main async function
-        asyncio.run(main(DRIVER))
+        asyncio.run(main(DRIVER, session))
     except KeyboardInterrupt:
         logger.info("Shutting down")
     except TimeoutError as te:
@@ -99,6 +106,9 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"Fatal error: {str(e)}", exc_info=True)
     finally:
+        if session:
+            session.close()
+            save_session_metadata(session)  # Save final metadata
         if DRIVER:
             DRIVER.quit()
         if _appium_process:

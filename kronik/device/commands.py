@@ -2,8 +2,8 @@ from datetime import datetime
 
 from appium.webdriver import Remote
 
-from kronik import DATA_DIR
 from kronik.logger import commands_logger as logger
+from kronik.session import Session, get_session_dir
 
 
 def home(driver: Remote) -> None:
@@ -19,17 +19,20 @@ def home(driver: Remote) -> None:
         raise
 
 
-def screenshot(driver: Remote) -> str:
+def screenshot(driver: Remote, session: Session) -> str:
     """
-    Take a screenshot and save it to data/screenshots directory.
+    Take a screenshot and save it to the current session's screenshots directory.
+
+    Args:
+        driver: The Appium driver instance
+        session: The current session instance
 
     Returns:
         str: Path to the saved screenshot file
     """
     try:
-        # Create screenshots directory if it doesn't exist
-        screenshots_dir = DATA_DIR.joinpath("screenshots")
-        screenshots_dir.mkdir(parents=True, exist_ok=True)
+        # Use the session's directory to save the screenshot
+        screenshots_dir = get_session_dir(session.id)
 
         # Generate filename with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
