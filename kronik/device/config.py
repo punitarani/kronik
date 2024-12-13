@@ -1,11 +1,7 @@
-from pathlib import Path
 
 from appium.options.android import UiAutomator2Options
 from appium.options.common import AppiumOptions
 from appium.webdriver import Remote
-
-PROJECT_ROOT = Path(__file__).parents[1]
-DATA_DIR = PROJECT_ROOT.joinpath("data")
 
 
 def appium_server_url():

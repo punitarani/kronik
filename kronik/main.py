@@ -12,9 +12,9 @@ from time import sleep
 import requests
 from appium.webdriver import Remote
 
-from kronik.actions import scroll_down, scroll_up
-from kronik.commands import home, screenshot
-from kronik.config import appium_driver, appium_server_url
+from kronik.device.actions import scroll_down, scroll_up
+from kronik.device.commands import home, screenshot
+from kronik.device.config import appium_driver, appium_server_url
 from kronik.logger import app_logger as logger
 
 EMULATOR_NAME = "KronikPixel"

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from appium.webdriver import Remote
 
-from kronik.config import DATA_DIR
+from kronik import DATA_DIR
 from kronik.logger import commands_logger as logger
 
 
