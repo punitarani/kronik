@@ -6,6 +6,7 @@
     - brew
     - Python 3.12+
     - Java Runtime Environment (JRE)
+    - LLVM
 - Android Debug Bridge (adb)
     - `brew install android-platform-tools`
 - Download Android Command Line tools
