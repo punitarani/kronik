@@ -25,9 +25,11 @@
       `avdmanager create avd -n KronikPixel -k "system-images;android-34;google_apis_playstore;arm64-v8a" --device "pixel"`
     - Start the emulator: `emulator -avd KronikPixel`
     - List all emulators: `emulator -list-avds`
-- Download Appium
+- Download [Appium](https://appium.io/docs/en/latest/)
     - Appium: `npm i --location=global appium`
     - Appium UIAutomator2 Server: `appium driver install uiautomator2`
+- Download [FFmpeg](https://www.ffmpeg.org/)
+    - MacOS: `brew install ffmpeg`
 - Setup Kronik
     - `poetry install`
 
