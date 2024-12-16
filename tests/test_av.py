@@ -1,7 +1,7 @@
 import unittest
 
 from kronik import PROJECT_ROOT
-from kronik.utils.av import extract_audio
+from kronik.utils import extract_audio
 
 
 class TestExtractAudio(unittest.TestCase):

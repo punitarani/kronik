@@ -1,7 +1,7 @@
 import unittest
 
 from kronik import PROJECT_ROOT
-from kronik.utils.transcribe import transcribe
+from kronik.utils import transcribe
 
 
 class TestTranscribe(unittest.TestCase):
