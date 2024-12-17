@@ -10,7 +10,7 @@ import time
 
 from appium.webdriver import Remote
 
-from kronik.device.actions import scroll_up
+from kronik.control.tiktok import TikTokController
 from kronik.device.app import SupportedApp, open_app, verify_app_installed
 from kronik.device.commands import screenshot, start_screenrecord, stop_screenrecord
 from kronik.logger import control_logger as logger
@@ -36,6 +36,9 @@ async def control(driver: Remote, session: Session) -> None:
         logger.error(f"Error launching TikTok: {str(e)}")
         raise
 
+    # Initialize TikTok controller
+    tiktok = TikTokController(driver, session)
+
     # Take initial screenshot
     screenshot(driver, session)
 
@@ -44,15 +47,25 @@ async def control(driver: Remote, session: Session) -> None:
     duration = 60  # Run for 60 seconds
     scroll_delay = 2  # Time between scrolls
 
-    logger.info(f"Starting scroll loop for {duration} seconds")
+    logger.info(f"Starting TikTok interaction loop for {duration} seconds")
 
     try:
         while time.time() - start_time < duration:
-            # Scroll down and take screenshot
-            scroll_up(driver)
+            # Like the video
+            tiktok.like()
+
+            # Take screenshot after interaction
             screenshot(driver, session)
 
-            # Wait before next scroll
+            # Get current video link
+            video_link = tiktok.get_link()
+            if video_link:
+                logger.info(f"Current video: {video_link}")
+
+            # Scroll to next video
+            tiktok.scroll_next()
+
+            # Wait before next interaction
             await asyncio.sleep(scroll_delay)
 
             # Log remaining time periodically
@@ -62,7 +75,7 @@ async def control(driver: Remote, session: Session) -> None:
                 logger.info(f"Scrolling: {int(remaining)}s remaining")
 
     except Exception as e:
-        logger.error(f"Error during scroll loop: {str(e)}")
+        logger.error(f"Error during TikTok interaction loop: {str(e)}")
         raise
 
     finally:
