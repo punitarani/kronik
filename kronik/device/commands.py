@@ -3,6 +3,10 @@ from datetime import datetime
 from pathlib import Path
 
 from appium.webdriver import Remote
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from kronik.logger import commands_logger as logger
 from kronik.session import Session, get_session_dir
@@ -13,12 +17,22 @@ _is_recording = False
 
 def home(driver: Remote) -> None:
     """
-    Navigate to the device's home screen.
+    Navigate to the device's home screen and verify we're there.
     """
     try:
         logger.info("Navigating to home screen")
         driver.press_keycode(3)  # Android home key code
-        logger.info("Successfully navigated to home screen")
+
+        # Wait for and verify we're on the home screen
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(
+                (By.ID, "com.google.android.apps.nexuslauncher:id/workspace")
+            )
+        )
+        logger.debug("Successfully navigated to home screen")
+    except TimeoutException:
+        logger.error("Failed to verify home screen: Nexus Launcher not found")
+        raise
     except Exception as e:
         logger.error(f"Failed to navigate to home screen: {str(e)}", exc_info=True)
         raise
@@ -136,7 +150,7 @@ def stop_screenrecord(
         with open(filepath, "wb") as f:
             f.write(base64.b64decode(base64_data))
 
-        logger.info(f"Screen recording saved: {filepath}")
+        logger.debug(f"Screen recording saved: {filepath}")
 
         # Reset state
         _is_recording = False
