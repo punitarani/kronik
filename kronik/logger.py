@@ -3,7 +3,7 @@ import sys
 from typing import Optional
 
 
-def setup_logger(name: str, level: Optional[int] = logging.INFO) -> logging.Logger:
+def setup_logger(name: str, level: Optional[int] = logging.DEBUG) -> logging.Logger:
     """
     Set up a logger with a specific format and configuration.
 
