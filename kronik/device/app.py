@@ -45,7 +45,7 @@ def open_app(driver: Remote, app: SupportedApp, wait_time: Optional[int] = 10) -
                 f"Current package: {driver.current_package.lower()}",
             )
 
-        logger.info(f"{app.display_name} launched successfully")
+        logger.debug(f"{app.display_name} launched successfully")
         return True
 
     except Exception as e:

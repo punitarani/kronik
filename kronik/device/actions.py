@@ -6,7 +6,7 @@ from kronik.logger import actions_logger as logger
 
 
 def scroll_up(driver):
-    logger.info("Scrolling up")
+    logger.debug("Scrolling up")
 
     # Get the window size
     window_size = driver.get_window_size()
@@ -30,7 +30,7 @@ def scroll_up(driver):
 
 
 def scroll_down(driver):
-    logger.info("Scrolling down")
+    logger.debug("Scrolling down")
 
     # Get the window size
     window_size = driver.get_window_size()
