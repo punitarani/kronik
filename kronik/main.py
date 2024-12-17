@@ -13,7 +13,9 @@ from typing import Optional
 
 import requests
 from appium.webdriver import Remote
+from dotenv import load_dotenv
 
+from kronik import PROJECT_ROOT
 from kronik.control import control
 from kronik.device.config import appium_driver, appium_server_url
 from kronik.logger import app_logger as logger
@@ -137,6 +139,13 @@ async def main() -> None:
     args = parse_args()
     device_setup = DeviceSetup()
     session = None
+
+    # Load environment variables
+    env_loaded = load_dotenv(PROJECT_ROOT.joinpath(".env"))
+    if not env_loaded:
+        logger.error("No .env file found to load environment variables")
+    else:
+        logger.info("Loaded environment variables from .env file")
 
     try:
         # Initialize session
