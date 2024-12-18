@@ -44,7 +44,17 @@ This is to test the functionality of the installed packages and tools.
 
 ## Running the application
 
-This runs the main kronik application.
+### Start the backend
+
+Start the backend API
+
+```bash
+Usage: poetry run uvicorn kronik.be.server:app--port 8000
+```
+
+### Run the application
+
+Runs the main kronik application.
 
 ```bash
 poetry run python kronik/main.py
