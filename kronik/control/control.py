@@ -6,16 +6,32 @@ It handles the device and brain integration and control.
 """
 
 import asyncio
-import time
+import json
+from pathlib import Path
 
 from appium.webdriver import Remote
 
+from kronik.brain.models import TikTokAnalysis
+from kronik.brain.tiktok import analyze_tiktok
 from kronik.control.tiktok import TikTokController
 from kronik.device.app import SupportedApp, open_app, verify_app_installed
 from kronik.device.commands import screenshot, start_screenrecord, stop_screenrecord
 from kronik.logger import control_logger as logger
 from kronik.session import Session
-from kronik.utils import extract_audio, transcribe
+
+
+class TikTokAnalysisEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, TikTokAnalysis):
+            return {
+                "transcript": obj.transcript,
+                "analysis": obj.analysis,
+                "tags": obj.tags,
+                "category": obj.category.value,
+                "rating": obj.rating,
+                "like": obj.like,
+            }
+        return super().default(obj)
 
 
 async def control(driver: Remote, session: Session) -> None:
@@ -26,8 +42,6 @@ async def control(driver: Remote, session: Session) -> None:
             missing_apps.append(app.display_name)
     if missing_apps:
         raise Exception(f"Required apps not installed: {', '.join(missing_apps)}")
-
-    recording_fp = start_screenrecord(driver, session)
 
     # Launch TikTok app and wait for it to load
     try:
@@ -42,53 +56,50 @@ async def control(driver: Remote, session: Session) -> None:
     # Take initial screenshot
     screenshot(driver, session)
 
-    # Set up timing variables
-    start_time = time.time()
-    duration = 60  # Run for 60 seconds
-    scroll_delay = 2  # Time between scrolls
-
-    logger.info(f"Starting TikTok interaction loop for {duration} seconds")
+    logger.info("Starting infinite TikTok interaction loop")
 
     try:
-        while time.time() - start_time < duration:
-            # Like the video
-            tiktok.like()
-
-            # Take screenshot after interaction
+        while True:  # Infinite loop
+            # Take a screenshot and start recording for 10 seconds
             screenshot(driver, session)
+            recording_fp = start_screenrecord(driver, session)
+            await asyncio.sleep(10)
+            recording_fp = stop_screenrecord(driver, session, recording_fp)
 
-            # Get current video link
+            if recording_fp is None:
+                logger.error("Failed to get recording file")
+                continue
+
+            # Analyze the TikTok
+            try:
+                analysis = await analyze_tiktok(Path(recording_fp))
+                if analysis:
+                    # Save analysis to JSON
+                    recording_path = Path(recording_fp)
+                    json_path = recording_path.with_suffix(".json")
+                    with open(json_path, "w") as f:
+                        json.dump(analysis, f, indent=2, cls=TikTokAnalysisEncoder)
+
+                    # Like the video if the analysis suggests it
+                    if analysis.like:
+                        tiktok.like()
+                        logger.info("Liked video based on analysis")
+
+            except Exception as e:
+                logger.error(f"Error during TikTok analysis: {str(e)}")
+
+            # Get the current video link
             video_link = tiktok.get_link()
             if video_link:
                 logger.info(f"Current video: {video_link}")
 
             # Scroll to next video
             tiktok.scroll_next()
-
-            # Wait before next interaction
-            await asyncio.sleep(scroll_delay)
-
-            # Log remaining time periodically
-            elapsed = time.time() - start_time
-            remaining = duration - elapsed
-            if int(remaining) % 10 == 0:  # Log every 10 seconds
-                logger.info(f"Scrolling: {int(remaining)}s remaining")
+            await asyncio.sleep(1)  # Brief pause between videos
 
     except Exception as e:
         logger.error(f"Error during TikTok interaction loop: {str(e)}")
         raise
 
     finally:
-        # Stop recording and process the video
-        recording_fp = stop_screenrecord(driver, session, recording_fp)
-        if recording_fp is not None:
-            audio_fp = extract_audio(recording_fp)
-            if audio_fp is None:
-                logger.warning("No audio stream found in the recording.")
-            else:
-                transcription = transcribe(audio_fp)
-                logger.info(f"Transcription: {transcription}")
-        else:
-            logger.warning("No recording file path available for audio extraction.")
-
         logger.info("Completed all actions")
