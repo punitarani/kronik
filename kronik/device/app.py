@@ -26,31 +26,36 @@ def open_app(driver: Remote, app: SupportedApp, wait_time: Optional[int] = 10) -
 
     Returns:
         bool: True if app opened successfully, False otherwise
-
-    Raises:
-        Exception: If app fails to launch properly
     """
     try:
         logger.info(f"Launching {app.display_name}...")
         driver.activate_app(app.package_id)
 
-        # Wait for app to be ready
+        # Wait for the app to be ready
         if wait_time:
-            driver.implicitly_wait(wait_time)
+            try:
+                driver.implicitly_wait(wait_time)
+            except Exception as e:
+                logger.warning(f"Failed to set wait time: {str(e)}")
 
         # Verify we're in the correct app
-        if app.package_id.lower() not in driver.current_package.lower():
-            raise Exception(
-                f"Failed to launch {app.display_name}",
-                f"Current package: {driver.current_package.lower()}",
-            )
+        try:
+            current_package = driver.current_package.lower()
+            if app.package_id.lower() not in current_package:
+                logger.error(
+                    f"Failed to launch {app.display_name}. " f"Current package: {current_package}"
+                )
+                return False
+        except Exception as e:
+            logger.error(f"Failed to verify app launch: {str(e)}")
+            return False
 
         logger.debug(f"{app.display_name} launched successfully")
         return True
 
     except Exception as e:
         logger.error(f"Error launching {app.display_name}: {str(e)}")
-        raise
+        return False
 
 
 def verify_app_installed(driver: Remote, app: SupportedApp) -> bool:
