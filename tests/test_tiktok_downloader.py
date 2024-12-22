@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from kronik import PROJECT_ROOT
+from kronik.models import TikTokStats
 from kronik.utils.tiktok_downloader import DownloadConfig, TikTokDownloader
 
 
@@ -61,10 +62,30 @@ class TestTikTokDownloader:
         mock_instance = MagicMock()
         mock_ytdl.return_value.__enter__.return_value = mock_instance
 
-        result = await self.downloader.download(self.TEST_URL, "test_tiktok_success")
+        # Mock the extract_info response with required fields
+        mock_instance.extract_info.return_value = {
+            "title": "Test Video",
+            "channel": "Test Channel",
+            "channel_id": "test123",
+            "channel_url": "https://www.tiktok.com/@test",
+            "webpage_url": "https://www.tiktok.com/@test/video/123",
+            "track": "Test Track",
+            "duration": 30,
+            "view_count": 1000,
+            "like_count": 100,
+            "repost_count": 10,
+            "comment_count": 50,
+            "uploader": "test_user",
+            "uploader_id": "test123",
+            "description": "Test description",
+            "upload_date": "20241221",
+            "timestamp": 1703187600,
+        }
 
-        assert isinstance(result, Path)
-        assert mock_instance.download.called
+        result = await self.downloader.download(self.TEST_URL, "test_tiktok_success")
+        assert result is not None
+        path, stats = result
+        assert isinstance(path, Path)
 
     @pytest.mark.asyncio
     @patch("yt_dlp.YoutubeDL")
@@ -88,5 +109,56 @@ class TestTikTokDownloader:
         result = await self.downloader.download(self.TEST_URL, "test_tiktok_integration")
 
         assert result is not None
-        assert result.exists()
-        assert result.stat().st_size > 0
+        assert result[0].exists()
+        assert result[0].stat().st_size > 0
+        assert isinstance(result[1], TikTokStats)
+
+    @pytest.mark.asyncio
+    async def test_tiktok_stats(self):
+        """Tests that TikTokStats are correctly parsed from download info"""
+        info = {
+            "title": "You made 2018 an AMAZING year. \nHow do we tell the story of 2018 in 2min? #tiktokrewind\n\n",
+            "channel": "TikTok",
+            "channel_id": "MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM",
+            "channel_url": "https://www.tiktok.com/@MS4wLjABAAAAv7iSuuXDJGDvJkmH_vz1qkDZYo1apxgzaxdBSeIuPiM",
+            "webpage_url": "https://www.tiktok.com/@tiktok/video/6635480525911887110",
+            "thumbnails": [
+                {"id": "dynamicCover", "url": "https://example.com/dynamic_cover.jpg"},
+                {
+                    "id": "cover",
+                    "url": "https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/3ea3effcf88849a58f60e91635e420ae?lk3s=81f88b70&x-expires=1735020000&x-signature=8nhBbyEhFupAaJnM3KqvnOGc8xY%3D&shp=81f88b70&shcp=-",
+                },
+                {"id": "originCover", "url": "https://example.com/origin_cover.jpg"},
+            ],
+            "timestamp": 1544943202,
+            "view_count": 7300000,
+            "like_count": 953100,
+            "repost_count": 26000,
+            "comment_count": 17600,
+            "duration": 137,
+            "track": "original sound",
+        }
+
+        result = await self.downloader.download(self.TEST_URL, "test_tiktok_stats")
+        assert result is not None
+
+        dl_fp, stats = result
+
+        assert result is not None
+        assert dl_fp.exists()
+        assert dl_fp.stat().st_size > 0
+
+        assert isinstance(stats, TikTokStats)
+        assert stats.title == info["title"]
+        assert stats.channel == info["channel"]
+        assert stats.channel_id == info["channel_id"]
+        assert str(stats.channel_url) == info["channel_url"]
+        assert str(stats.tiktok_url) == info["webpage_url"]
+        assert str(stats.thumbnail_url) == info["thumbnails"][1]["url"]
+        assert stats.timestamp == info["timestamp"]
+        assert stats.view_count >= info["view_count"]
+        assert stats.like_count >= info["like_count"]
+        assert stats.repost_count >= info["repost_count"]
+        assert stats.comment_count >= info["comment_count"]
+        assert stats.duration == info["duration"]
+        assert stats.track == info["track"]

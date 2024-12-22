@@ -9,6 +9,7 @@ import yt_dlp
 from pydantic import BaseModel
 
 from kronik.logger import downloader_logger as logger
+from kronik.models import TikTokStats
 
 
 class DownloadConfig(BaseModel):
@@ -33,15 +34,16 @@ class TikTokDownloader:
         if not config.logs:
             self.logger.disabled = True
 
-    async def download(self, url: str, name: str) -> Optional[Path]:
-        """Downloads a TikTok video and returns its saved path asynchronously
+    async def download(self, url: str, name: str) -> Optional[tuple[Path, dict]]:
+        """Downloads a TikTok video and returns its saved path and info asynchronously
 
         Args:
             url: TikTok video URL
             name: Base name for the saved file
 
         Returns:
-            Path to the downloaded file if successful, None otherwise
+            Tuple containing the path to the downloaded file and the info dictionary if successful,
+            None otherwise
         """
         if not self._is_tiktok_url(url):
             self.logger.error(f"Failed to Download: Invalid TikTok URL - {url}")
@@ -53,19 +55,20 @@ class TikTokDownloader:
         try:
             # Run yt-dlp download in a thread pool to avoid blocking
             loop = asyncio.get_running_loop()
-            await loop.run_in_executor(None, partial(self._download_video, url, output_path))
+            info = await loop.run_in_executor(None, partial(self._download_video, url, output_path))
 
             self.logger.info(f"Downloaded {url} to {output_path}")
-            return output_path
+            return output_path, TikTokStats.from_info(info=info)
 
         except Exception as e:
             self.logger.error(f"Failed to Download: {str(e)}")
             return None
 
-    def _download_video(self, url: str, output_path: Path) -> None:
+    def _download_video(self, url: str, output_path: Path) -> dict:
         """Helper method to perform the actual download"""
         with yt_dlp.YoutubeDL(self._get_ydl_options(output_path)) as ydl:
-            ydl.download([url])
+            info = ydl.extract_info(url, download=True)
+            return info
 
     @staticmethod
     def _is_tiktok_url(url: str) -> bool:
