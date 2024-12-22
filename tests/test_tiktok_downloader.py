@@ -104,18 +104,8 @@ class TestTikTokDownloader:
 
     @pytest.mark.asyncio
     @pytest.mark.integration
-    async def test_integration(self):
-        """Tests actual TikTok video download"""
-        result = await self.downloader.download(self.TEST_URL, "test_tiktok_integration")
-
-        assert result is not None
-        assert result[0].exists()
-        assert result[0].stat().st_size > 0
-        assert isinstance(result[1], TikTokStats)
-
-    @pytest.mark.asyncio
-    async def test_tiktok_stats(self):
-        """Tests that TikTokStats are correctly parsed from download info"""
+    async def test_download(self):
+        """Tests TikTok video download and TikTokStats parsing"""
         info = {
             "title": "You made 2018 an AMAZING year. \nHow do we tell the story of 2018 in 2min? #tiktokrewind\n\n",
             "channel": "TikTok",
@@ -139,12 +129,11 @@ class TestTikTokDownloader:
             "track": "original sound",
         }
 
-        result = await self.downloader.download(self.TEST_URL, "test_tiktok_stats")
+        result = await self.downloader.download(self.TEST_URL, "test_tiktok_download")
         assert result is not None
 
         dl_fp, stats = result
 
-        assert result is not None
         assert dl_fp.exists()
         assert dl_fp.stat().st_size > 0
 
