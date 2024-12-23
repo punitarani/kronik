@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from datetime import datetime
 from functools import partial
 from pathlib import Path
 from typing import Optional
@@ -78,9 +77,16 @@ class TikTokDownloader:
         )
 
     def _get_output_path(self, name: str) -> Path:
-        """Generates unique output path with timestamp"""
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        return self.config.save_dir / f"{name}_{timestamp}.mp4"
+        """Generates a unique output path with an incrementing number if needed."""
+        fp = self.config.save_dir.joinpath(f"{name}.mp4")
+        counter = 1
+
+        # Increment counter if the file already exists
+        while fp.exists():
+            fp = self.config.save_dir.joinpath(f"{name}-{counter}.mp4")
+            counter += 1
+
+        return fp
 
     def _get_ydl_options(self, output_path: Path) -> dict:
         """Returns yt-dlp options for downloading"""
