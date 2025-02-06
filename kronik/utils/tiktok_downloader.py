@@ -1,8 +1,8 @@
-import asyncio
 import logging
-from functools import partial
 from pathlib import Path
+import re
 from typing import Optional
+from urllib.parse import urlparse
 
 import yt_dlp
 from pydantic import BaseModel
@@ -33,12 +33,11 @@ class TikTokDownloader:
         if not config.logs:
             self.logger.disabled = True
 
-    async def download(self, url: str, name: str) -> Optional[tuple[Path, dict]]:
+    async def download(self, url: str) -> Optional[tuple[Path, dict]]:
         """Downloads a TikTok video and returns its saved path and info asynchronously
 
         Args:
             url: TikTok video URL
-            name: Base name for the saved file
 
         Returns:
             Tuple containing the path to the downloaded file and the info dictionary if successful,
@@ -48,13 +47,12 @@ class TikTokDownloader:
             self.logger.error(f"Failed to Download: Invalid TikTok URL - {url}")
             return None
 
-        output_path = self._get_output_path(name)
+        # Get the filename from the url
+        output_path = self._get_output_path(url=url)
         self.logger.debug(f"Downloading: {url}")
 
         try:
-            # Run yt-dlp download in a thread pool to avoid blocking
-            loop = asyncio.get_running_loop()
-            info = await loop.run_in_executor(None, partial(self._download_video, url, output_path))
+            info = self._download_video(url, output_path)
 
             self.logger.info(f"Downloaded {url} to {output_path}")
             return output_path, TikTokStats.from_info(info=info)
@@ -76,17 +74,22 @@ class TikTokDownloader:
             ("https://www.tiktok.com/", "https://vm.tiktok.com/", "https://vt.tiktok.com/")
         )
 
-    def _get_output_path(self, name: str) -> Path:
-        """Generates a unique output path with an incrementing number if needed."""
-        fp = self.config.save_dir.joinpath(f"{name}.mp4")
-        counter = 1
+    def _get_output_path(self, url: str) -> Path:
+        """Generates a unique output path based on the URL"""
+        parsed_url = urlparse(url)
 
-        # Increment counter if the file already exists
-        while fp.exists():
-            fp = self.config.save_dir.joinpath(f"{name}-{counter}.mp4")
-            counter += 1
+        # Get the path and split by '/' to extract the correct segment based on the URL structure
+        path_segments = parsed_url.path.strip("/").split("/")
+        if path_segments[0] == "t":
+            fn = path_segments[1]  # Extract the ID for tiktok.com/t/ format
+        elif len(path_segments) > 2 and path_segments[1] == "video":
+            fn = path_segments[2]  # Extract the ID for tiktok.com/@handle/video/ format
+        else:
+            # Remove http(s):// and everything before first / after that
+            cleaned_url = re.sub(r"^https?://[^/]+/", "", url)
+            fn = re.sub(r"[^\w\-_.]", "_", cleaned_url)
 
-        return fp
+        return self.config.save_dir.joinpath(f"{fn}.mp4")
 
     def _get_ydl_options(self, output_path: Path) -> dict:
         """Returns yt-dlp options for downloading"""

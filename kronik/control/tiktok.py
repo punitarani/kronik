@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from appium.webdriver import Remote
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.common.by import By
@@ -6,7 +8,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from kronik.device.actions import scroll_up
 from kronik.logger import control_logger as logger
-from kronik.session import Session
+from kronik.models import TikTokStats
+from kronik.session import Session, get_session_dir
+from kronik.utils.tiktok_downloader import DownloadConfig, TikTokDownloader
 
 
 class TikTokController:
@@ -14,11 +18,16 @@ class TikTokController:
         self.driver: Remote = driver
         self.session: Session = session
 
-        # Default 2s timeout for all waits
-        self.wait = WebDriverWait(self.driver, 3)
+        # Configure downloader with session's download directory
+        download_dir = get_session_dir(session.id)
+        config = DownloadConfig(save_dir=download_dir)
+        self.downloader = TikTokDownloader(config)
+
+        # Default 1s timeout for all waits
+        self.wait = WebDriverWait(self.driver, 1)
 
     def like(self) -> bool:
-        """Double tap to like tiktok."""
+        """Double tap to like the TikTok."""
         try:
             # Get window size
             window_size = self.driver.get_window_size()
@@ -86,3 +95,8 @@ class TikTokController:
                 self.driver.back()
             except WebDriverException:
                 pass
+
+    async def download(self) -> tuple[Path | None, TikTokStats] | None:
+        """Download the current TikTok video"""
+        url = self.get_link()
+        return await self.downloader.download(url, name=f"tiktok_{self.session.id}")

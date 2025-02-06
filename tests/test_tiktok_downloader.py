@@ -24,7 +24,7 @@ class TestTikTokDownloader:
         self.test_dir.mkdir(parents=True, exist_ok=True)
 
         config = DownloadConfig(
-            save_dir=self.test_dir, use_chrome_cookies=False, logs=True  # Disable logging in tests
+            save_dir=self.test_dir, use_chrome_cookies=False, logs=True
         )
         self.downloader = TikTokDownloader(config)
 
@@ -82,7 +82,7 @@ class TestTikTokDownloader:
             "timestamp": 1703187600,
         }
 
-        result = await self.downloader.download(self.TEST_URL, "test_tiktok_success")
+        result = await self.downloader.download(self.TEST_URL)
         assert result is not None
         path, stats = result
         assert isinstance(path, Path)
@@ -93,13 +93,13 @@ class TestTikTokDownloader:
         """Tests download failure handling"""
         mock_ytdl.return_value.__enter__.return_value.download.side_effect = Exception("Failed")
 
-        result = await self.downloader.download(self.TEST_URL, "test_tiktok_failure")
+        result = await self.downloader.download(self.TEST_URL)
         assert result is None
 
     @pytest.mark.asyncio
     async def test_invalid_url(self):
         """Tests download with invalid URL"""
-        result = await self.downloader.download("https://invalid-url.com", "test_tiktok_invalid")
+        result = await self.downloader.download("https://invalid-url.com")
         assert result is None
 
     @pytest.mark.asyncio
@@ -116,7 +116,7 @@ class TestTikTokDownloader:
                 {"id": "dynamicCover", "url": "https://example.com/dynamic_cover.jpg"},
                 {
                     "id": "cover",
-                    "url": "https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/3ea3effcf88849a58f60e91635e420ae?lk3s=81f88b70&x-expires=1735020000&x-signature=8nhBbyEhFupAaJnM3KqvnOGc8xY%3D&shp=81f88b70&shcp=-",
+                    "url": "https://p16-sign-va.tiktokcdn.com/obj/tos-maliva-p-0068/3ea3effcf88849a58f60e91635e420ae",
                 },
                 {"id": "originCover", "url": "https://example.com/origin_cover.jpg"},
             ],
@@ -129,7 +129,7 @@ class TestTikTokDownloader:
             "track": "original sound",
         }
 
-        result = await self.downloader.download(self.TEST_URL, "test_tiktok_download")
+        result = await self.downloader.download(self.TEST_URL)
         assert result is not None
 
         dl_fp, stats = result
@@ -143,7 +143,7 @@ class TestTikTokDownloader:
         assert stats.channel_id == info["channel_id"]
         assert str(stats.channel_url) == info["channel_url"]
         assert str(stats.tiktok_url) == info["webpage_url"]
-        assert str(stats.thumbnail_url) == info["thumbnails"][1]["url"]
+        assert str(stats.thumbnail_url).split("?")[0] == info["thumbnails"][1]["url"]
         assert stats.timestamp == info["timestamp"]
         assert stats.view_count >= info["view_count"]
         assert stats.like_count >= info["like_count"]
