@@ -1,6 +1,6 @@
 import logging
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -33,7 +33,7 @@ class TikTokDownloader:
         if not config.logs:
             self.logger.disabled = True
 
-    async def download(self, url: str) -> Optional[tuple[Path, dict]]:
+    async def download(self, url: str) -> Optional[tuple[Path, TikTokStats]]:
         """Downloads a TikTok video and returns its saved path and info asynchronously
 
         Args:

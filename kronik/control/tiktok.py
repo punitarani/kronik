@@ -99,4 +99,4 @@ class TikTokController:
     async def download(self) -> tuple[Path | None, TikTokStats] | None:
         """Download the current TikTok video"""
         url = self.get_link()
-        return await self.downloader.download(url, name=f"tiktok_{self.session.id}")
+        return await self.downloader.download(url)

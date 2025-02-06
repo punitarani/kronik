@@ -23,9 +23,7 @@ class TestTikTokDownloader:
         self.test_dir = self.TEST_DATA_DIR
         self.test_dir.mkdir(parents=True, exist_ok=True)
 
-        config = DownloadConfig(
-            save_dir=self.test_dir, use_chrome_cookies=False, logs=True
-        )
+        config = DownloadConfig(save_dir=self.test_dir, use_chrome_cookies=False, logs=True)
         self.downloader = TikTokDownloader(config)
 
         yield
