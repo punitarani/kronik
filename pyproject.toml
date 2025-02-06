@@ -9,7 +9,6 @@ readme = "README.md"
 python = "^3.12 <3.14"
 appium-python-client = "^4.4.0"
 einops = "^0.8.0"
-fastapi = {extras = ["standard"], version = "^0.115.6"}
 ffmpeg-python = "^0.2.0"
 google-genai = "^1.0.0"
 llvmlite = "^0.44.0"
