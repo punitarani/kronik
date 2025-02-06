@@ -1,10 +1,16 @@
 from pathlib import Path
 
-from google.genai.types import GenerateContentConfig, HarmCategory, Part, SafetySetting
+from google.genai.types import (
+    GenerateContentConfig,
+    HarmBlockThreshold,
+    HarmCategory,
+    Part,
+    SafetySetting,
+)
 
+from kronik.llm.client import client
 from kronik.logger import brain_logger as logger
 
-from .client import client
 from .models import TikTokAnalysis, TikTokCategoryEnum
 from .prompts import analyze_tiktok_prompt
 
@@ -26,18 +32,12 @@ def _analyze_tiktok_generation_config() -> GenerateContentConfig:
         },
     }
 
-    harm_categories: list[HarmCategory] = [
-        "HARM_CATEGORY_HATE_SPEECH",
-        "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "HARM_CATEGORY_HARASSMENT",
-        "HARM_CATEGORY_CIVIC_INTEGRITY",
-    ]
+    harm_categories = [category.value for category in HarmCategory]
 
     safety_settings = [
         SafetySetting(
             category=harm_category,
-            threshold="BLOCK_NONE",
+            threshold=HarmBlockThreshold.BLOCK_NONE,
         )
         for harm_category in harm_categories
     ]
