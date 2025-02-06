@@ -5,6 +5,9 @@ description = "Chronically scrolling visual agent"
 authors = ["Punit Arani <punit@punitsai36@gmail.com>"]
 readme = "README.md"
 
+[tool.poetry.scripts]
+setup = "scripts.setup:setup"
+
 [tool.poetry.dependencies]
 python = "^3.12 <3.14"
 appium-python-client = "^4.4.0"

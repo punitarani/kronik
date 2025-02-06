@@ -1,7 +1,12 @@
 # Makefile
 
 # List of directories and files to format and lint
-TARGETS = kronik/ tests/
+TARGETS = kronik/ tests/ scripts/
+
+# Setup the project
+setup:
+	poetry install
+	poetry run setup
 
 # Run the tests
 test:
