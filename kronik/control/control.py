@@ -11,18 +11,18 @@ from pathlib import Path
 
 from appium.webdriver import Remote
 
-from kronik.brain.models import TikTokAnalysis
 from kronik.brain.tiktok import analyze_tiktok
 from kronik.control.tiktok import TikTokController
 from kronik.device.app import SupportedApp, open_app, verify_app_installed
 from kronik.device.commands import screenshot, start_screenrecord, stop_screenrecord
 from kronik.logger import control_logger as logger
+from kronik.models import Analysis
 from kronik.session import Session
 
 
 class TikTokAnalysisEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, TikTokAnalysis):
+        if isinstance(obj, Analysis):
             return {
                 "transcript": obj.transcript,
                 "analysis": obj.analysis,

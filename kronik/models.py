@@ -1,3 +1,5 @@
+from enum import Enum
+
 from pydantic import BaseModel, HttpUrl
 
 
@@ -48,3 +50,28 @@ class TikTokStats(BaseModel):
             duration=info.get("duration"),
             track=info.get("track"),
         )
+
+
+class Category(Enum):
+    ENTERTAINMENT = "ENTERTAINMENT"
+    EDUCATION = "EDUCATION"
+    LIFESTYLE = "LIFESTYLE"
+    FOOD = "FOOD"
+    CREATIVITY = "CREATIVITY"
+    TRAVEL = "TRAVEL"
+    BUSINESS_FINANCE = "BUSINESS_FINANCE"
+    TECH = "TECH"
+    GAMING = "GAMING"
+    SPORTS = "SPORTS"
+    CULTURE_HISTORY = "CULTURE_HISTORY"
+    SOCIAL_ISSUES = "SOCIAL_ISSUES"
+    MISC = "MISC"
+
+
+class Analysis(BaseModel):
+    transcript: str
+    analysis: str
+    tags: list[str]
+    category: Category
+    rating: int
+    like: bool

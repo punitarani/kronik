@@ -10,8 +10,8 @@ from google.genai.types import (
 
 from kronik.llm.client import client
 from kronik.logger import brain_logger as logger
+from kronik.models import Analysis, Category
 
-from .models import TikTokAnalysis, TikTokCategoryEnum
 from .prompts import analyze_tiktok_prompt
 
 
@@ -25,7 +25,7 @@ def _analyze_tiktok_generation_config() -> GenerateContentConfig:
             "tags": {"type": "ARRAY", "items": {"type": "STRING"}},
             "category": {
                 "type": "STRING",
-                "enum": [category.value for category in TikTokCategoryEnum],
+                "enum": [category.value for category in Category],
             },
             "rating": {"type": "INTEGER"},
             "like": {"type": "BOOLEAN"},
@@ -53,7 +53,7 @@ def _analyze_tiktok_generation_config() -> GenerateContentConfig:
     return generation_config
 
 
-async def analyze_tiktok(tiktok_fp: Path) -> TikTokAnalysis | None:
+async def analyze_tiktok(tiktok_fp: Path) -> Analysis | None:
     """
     Analyze a TikTok
     """
@@ -88,7 +88,7 @@ async def analyze_tiktok(tiktok_fp: Path) -> TikTokAnalysis | None:
         logger.debug(
             f"Successfully received response from Gemini: {response.candidates[0].content.parts[0].text}"
         )
-        return TikTokAnalysis.model_validate_json(response.candidates[0].content.parts[0].text)
+        return Analysis.model_validate_json(response.candidates[0].content.parts[0].text)
 
     except Exception as e:
         logger.error(f"Error during TikTok analysis: {str(e)}")

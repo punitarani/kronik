@@ -3,8 +3,8 @@ import json
 import pytest
 
 from kronik import PROJECT_ROOT
-from kronik.brain.models import TikTokAnalysis, TikTokCategoryEnum
 from kronik.brain.tiktok import analyze_tiktok
+from kronik.models import Analysis, Category
 
 
 @pytest.fixture
@@ -26,14 +26,14 @@ async def test_analyze_tiktok_success(test_paths):
 
     # Check that we got a result
     assert result is not None
-    assert isinstance(result, TikTokAnalysis)
+    assert isinstance(result, Analysis)
 
     # Validate the structure of the response
     assert isinstance(result.transcript, str)
     assert isinstance(result.analysis, str)
     assert isinstance(result.tags, list)
     assert all(isinstance(tag, str) for tag in result.tags)
-    assert isinstance(result.category, TikTokCategoryEnum)
+    assert isinstance(result.category, Category)
     assert isinstance(result.rating, int)
     assert 1 <= result.rating <= 10, "Rating should be between 1 and 10"
     assert isinstance(result.like, bool)
