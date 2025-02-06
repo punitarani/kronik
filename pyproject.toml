@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12 <3.14"
 appium-python-client = "^4.4.0"
+chromadb = "^0.6.3"
 einops = "^0.8.0"
 ffmpeg-python = "^0.2.0"
 google-genai = "^1.0.0"
