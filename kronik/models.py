@@ -1,24 +1,60 @@
+"""Models for kronik."""
+
+from datetime import datetime
 from enum import Enum
+from typing import List, Optional
 
 from pydantic import BaseModel, HttpUrl
+
+
+class SessionStatus(str, Enum):
+    """Session status."""
+
+    ACTIVE = "active"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class Category(str, Enum):
+    """Content category."""
+
+    ENTERTAINMENT = "entertainment"
+    EDUCATION = "education"
+    NEWS = "news"
+    SPORTS = "sports"
+    MUSIC = "music"
+    GAMING = "gaming"
+    FOOD = "food"
+    FASHION = "fashion"
+    TECH = "tech"
+    OTHER = "other"
+
+
+class Session(BaseModel):
+    """Session model."""
+
+    id: str
+    status: SessionStatus
+    created_at: Optional[datetime] = None
 
 
 class TikTokStats(BaseModel):
     """TikTok Statistics"""
 
-    title: str | None = None
-    channel: str | None = None
-    channel_id: str | None = None
-    channel_url: HttpUrl | None = None
-    tiktok_url: HttpUrl | None = None
-    thumbnail_url: HttpUrl | None = None
-    timestamp: int | None = None
-    view_count: int | None = None
-    like_count: int | None = None
-    repost_count: int | None = None
-    comment_count: int | None = None
-    duration: int | None = None
-    track: str | None = None
+    title: Optional[str] = None
+    channel: Optional[str] = None
+    channel_id: Optional[str] = None
+    channel_url: Optional[HttpUrl] = None
+    tiktok_url: Optional[HttpUrl] = None
+    thumbnail_url: Optional[HttpUrl] = None
+    timestamp: Optional[int] = None
+    view_count: Optional[int] = None
+    like_count: Optional[int] = None
+    repost_count: Optional[int] = None
+    comment_count: Optional[int] = None
+    duration: Optional[int] = None
+    track: Optional[str] = None
+    created_at: Optional[datetime] = None
 
     @classmethod
     def from_info(cls, info: dict) -> "TikTokStats":
@@ -52,26 +88,13 @@ class TikTokStats(BaseModel):
         )
 
 
-class Category(Enum):
-    ENTERTAINMENT = "ENTERTAINMENT"
-    EDUCATION = "EDUCATION"
-    LIFESTYLE = "LIFESTYLE"
-    FOOD = "FOOD"
-    CREATIVITY = "CREATIVITY"
-    TRAVEL = "TRAVEL"
-    BUSINESS_FINANCE = "BUSINESS_FINANCE"
-    TECH = "TECH"
-    GAMING = "GAMING"
-    SPORTS = "SPORTS"
-    CULTURE_HISTORY = "CULTURE_HISTORY"
-    SOCIAL_ISSUES = "SOCIAL_ISSUES"
-    MISC = "MISC"
-
-
 class Analysis(BaseModel):
+    """Content analysis."""
+
     transcript: str
     analysis: str
-    tags: list[str]
+    tags: List[str]
     category: Category
     rating: int
     like: bool
+    created_at: Optional[datetime] = None

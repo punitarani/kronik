@@ -11,6 +11,7 @@ from pathlib import Path
 
 from kronik import DATA_DIR
 from kronik.logger import session_logger as logger
+from kronik.models import SessionStatus
 
 
 class Session:
@@ -25,19 +26,23 @@ class Session:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.id = f"session_{timestamp}"
         self.created_at = datetime.now().isoformat()
-        self.status = "active"
+        self.status = SessionStatus.ACTIVE
 
         logger.info(f"Created new session: {self.id}")
 
     def close(self):
         """Mark the session as completed."""
-        self.status = "completed"
+        self.status = SessionStatus.COMPLETED
         logger.info(f"Closed session: {self.id}")
 
     @property
     def metadata(self) -> dict:
         """Get the session metadata."""
-        return {"id": self.id, "created_at": self.created_at, "status": self.status}
+        return {
+            "id": self.id,
+            "created_at": self.created_at,
+            "status": self.status.value,
+        }
 
 
 def get_session_dir(session_id: str) -> Path:
